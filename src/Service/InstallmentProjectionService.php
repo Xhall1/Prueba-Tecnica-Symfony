@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\DTO\Response\InstallmentResponse;
 use App\Entity\Contract;
+use \App\Entity\Installment;
 use App\Service\PaymentCalculator\PaymentCalculator;
 
 class InstallmentProjectionService
@@ -46,7 +47,7 @@ class InstallmentProjectionService
             $installmentAmount = $calculator->calculateInstallmentAmount($baseAmount);
             $dueDate = $contract->getContractDate()->modify("+{$i} month");
 
-            $installment = new \App\Entity\Installment();
+            $installment = new Installment();
             $installment->setContract($contract);
             $installment->setInstallmentNumber($i);
             $installment->setAmount((string)number_format($installmentAmount, 2, '.', ''));
