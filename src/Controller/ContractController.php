@@ -205,4 +205,35 @@ final class ContractController extends AbstractController
             'projection' => $projection
         ]);
     }
+
+    # DELETE contract
+    #[Route('/api/v1/contract/{id}', methods: ['DELETE'])]
+    public function deleteContract(int $id): JsonResponse
+    {
+        $contract = $this->em->getRepository(Contract::class)->find($id);
+
+        if (!$contract) {
+            return $this->json([
+                'state' => 'error',
+                'message' => 'Contrato no encontrado'
+            ], 404);
+        }
+
+        try {
+            $this->em->remove($contract);
+            $this->em->flush();
+
+            return $this->json([
+                'state' => 'ok',
+                'message' => 'Contrato eliminado correctamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return $this->json([
+                'state' => 'error',
+                'message' => 'Error al eliminar el contrato: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+
