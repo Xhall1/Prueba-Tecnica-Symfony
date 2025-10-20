@@ -148,4 +148,61 @@ final class ContractController extends AbstractController
             ], 500);
         }
     }
+
+    # GET installments projection
+    #[Route('/api/v1/contract/{id}/installments', methods: ['GET'])]
+    public function getInstallments(int $id, Request $request): JsonResponse
+    {
+        $contract = $this->em->getRepository(Contract::class)->find($id);
+
+        if (!$contract) {
+            return $this->json([
+                'state' => 'error',
+                'message' => 'Contrato no encontrado'
+            ], 404);
+        }
+
+        # GET number of months
+        $months = $request->query->get('months', $contract->getNumberOfInstallments());
+
+        # Calculating projection
+        $baseAmount = floatval($contract->getTotalValue()) / intval($months);
+        $paymentMethod = $contract->getPaymentMethod();
+
+        if ($paymentMethod === 'paypal') {
+            $interestRate = 0.01;
+            $transactionFee = 0.02;
+        } else {
+            $interestRate = 0.02;
+            $transactionFee = 0.01;
+        }
+
+        $projection = [];
+        for ($i = 1; $i <= $months; $i++) {
+            $interest = $baseAmount * $interestRate;
+            $fee = $baseAmount * $transactionFee;
+            $installmentAmount = $baseAmount + $interest + $fee;
+
+            $dueDate = $contract->getContractDate()->modify("+{$i} month");
+
+            $projection[] = [
+                'installmentNumber' => $i,
+                'amount' => number_format($installmentAmount, 2, '.', ''),
+                'dueDate' => $dueDate->format('Y-m-d'),
+                'interestRate' => $interestRate * 100 . '%',
+                'transactionFee' => $transactionFee * 100 . '%'
+            ];
+        }
+
+        return $this->json([
+            'state' => 'ok',
+            'contract' => [
+                'id' => $contract->getId(),
+                'contractNumber' => $contract->getContractNumber(),
+                'totalValue' => $contract->getTotalValue(),
+                'paymentMethod' => $contract->getPaymentMethod()
+            ],
+            'projection' => $projection
+        ]);
+    }
 }
