@@ -3,8 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\ContractRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Installment;
 
 #[ORM\Entity(repositoryClass: ContractRepository::class)]
 class Contract
@@ -35,6 +38,14 @@ class Contract
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'contract', targetEntity: Installment::class, cascade: ['persist', 'remove'])]
+    private Collection $installments;
+
+    public function __construct()
+    {
+        $this->installments = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -48,7 +59,6 @@ class Contract
     public function setContractNumber(string $contractNumber): static
     {
         $this->contractNumber = $contractNumber;
-
         return $this;
     }
 
@@ -60,7 +70,6 @@ class Contract
     public function setContractDate(\DateTimeImmutable $contractDate): static
     {
         $this->contractDate = $contractDate;
-
         return $this;
     }
 
@@ -72,7 +81,6 @@ class Contract
     public function setTotalValue(float $totalValue): static
     {
         $this->totalValue = $totalValue;
-
         return $this;
     }
 
@@ -84,7 +92,6 @@ class Contract
     public function setPaymentMethod(string $paymentMethod): static
     {
         $this->paymentMethod = $paymentMethod;
-
         return $this;
     }
 
@@ -96,7 +103,6 @@ class Contract
     public function setNumberOfInstallments(int $numberOfInstallments): static
     {
         $this->numberOfInstallments = $numberOfInstallments;
-
         return $this;
     }
 
@@ -108,7 +114,6 @@ class Contract
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -120,6 +125,33 @@ class Contract
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    public function getInstallments(): Collection
+    {
+        return $this->installments;
+    }
+
+    #METHODS to add installments
+    public function addInstallment(Installment $installment): static
+    {
+        if (!$this->installments->contains($installment)) {
+            $this->installments->add($installment);
+            $installment->setContract($this);
+        }
+
+        return $this;
+    }
+
+    #METHODS to remove installments
+    public function removeInstallment(Installment $installment): static
+    {
+        if ($this->installments->removeElement($installment)) {
+            if ($installment->getContract() === $this) {
+                $installment->setContract(null);
+            }
+        }
 
         return $this;
     }

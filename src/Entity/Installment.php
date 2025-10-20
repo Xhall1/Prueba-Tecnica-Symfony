@@ -28,7 +28,7 @@ class Installment
     #[ORM\Column]
     private ?float $transactionFee = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'installments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Contract $contract = null;
 
@@ -45,7 +45,6 @@ class Installment
     public function setInstallmentNumber(int $installmentNumber): static
     {
         $this->installmentNumber = $installmentNumber;
-
         return $this;
     }
 
@@ -57,7 +56,6 @@ class Installment
     public function setAmount(float $amount): static
     {
         $this->amount = $amount;
-
         return $this;
     }
 
@@ -69,7 +67,6 @@ class Installment
     public function setDueDate(\DateTimeImmutable $dueDate): static
     {
         $this->dueDate = $dueDate;
-
         return $this;
     }
 
@@ -81,7 +78,6 @@ class Installment
     public function setInterestRate(float $interestRate): static
     {
         $this->interestRate = $interestRate;
-
         return $this;
     }
 
@@ -93,7 +89,6 @@ class Installment
     public function setTransactionFee(float $transactionFee): static
     {
         $this->transactionFee = $transactionFee;
-
         return $this;
     }
 
@@ -105,7 +100,6 @@ class Installment
     public function setContract(?Contract $contract): static
     {
         $this->contract = $contract;
-
         return $this;
     }
 }
