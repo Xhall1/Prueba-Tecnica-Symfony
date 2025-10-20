@@ -106,4 +106,15 @@ class ContractService
             )
         );
     }
+
+    public function getContractEntity(int $id): Contract
+    {
+        $contract = $this->contractRepository->find($id);
+
+        if (!$contract) {
+            throw new Contract404Exception($id);
+        }
+
+        return $contract;
+    }
 }
