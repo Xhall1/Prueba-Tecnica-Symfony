@@ -9,6 +9,9 @@ RUN a2enmod rewrite
 COPY . /var/www/html/
 WORKDIR /var/www/html
 
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
+
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader
 
