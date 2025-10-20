@@ -1,9 +1,10 @@
 <?php
-
 namespace App\Entity;
 
-use App\Repository\InstallmentRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use App\Entity\Contract;
 
 #[ORM\Entity(repositoryClass: InstallmentRepository::class)]
 class Installment
@@ -19,8 +20,9 @@ class Installment
     #[ORM\Column]
     private ?float $amount = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $dueDate = null;
+
 
     #[ORM\Column]
     private ?float $interestRate = null;
@@ -28,9 +30,11 @@ class Installment
     #[ORM\Column]
     private ?float $transactionFee = null;
 
-    #[ORM\ManyToOne(inversedBy: 'installments')]
+    #[ORM\ManyToOne(targetEntity: Contract::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Ignore]
     private ?Contract $contract = null;
+
 
     public function getId(): ?int
     {
